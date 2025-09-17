@@ -1,0 +1,11 @@
+{ "$schema":"http://json-schema.org/draft-07/schema#", "title":"IntakeV1","type":"object",
+  "properties": {
+    "fullName":{"type":"string"},
+    "dob":{"type":"string","format":"date"},
+    "insurance":{"type":"object","properties":{
+      "payerCode":{"type":"string"},
+      "memberId":{"type":"string"}
+    },"required":["payerCode","memberId"]}
+  },
+  "required":["fullName","dob","insurance"]
+}

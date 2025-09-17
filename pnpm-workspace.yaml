@@ -1,0 +1,12 @@
+ignoredBuiltDependencies:
+  - '@hyperjump/json-pointer'
+  - '@hyperjump/json-schema'
+  - '@hyperjump/json-schema-core'
+  - '@hyperjump/pact'
+  - protobufjs
+  - yarn
+
+onlyBuiltDependencies:
+  - '@asyncapi/cli'
+  - puppeteer
+  - sharp

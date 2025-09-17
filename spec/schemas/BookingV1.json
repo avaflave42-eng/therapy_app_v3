@@ -1,0 +1,8 @@
+{ "$schema":"http://json-schema.org/draft-07/schema#", "title":"BookingV1","type":"object",
+  "properties": {
+    "requestId":{"type":"string","format":"uuid"},
+    "providerNpi":{"type":"string"},
+    "slot":{"type":"string","format":"date-time"}
+  },
+  "required":["requestId","providerNpi","slot"]
+}

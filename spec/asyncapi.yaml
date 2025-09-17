@@ -1,0 +1,15 @@
+asyncapi: 3.0.0
+id: urn:therapy-app
+info:
+  title: Therapy App Events
+  version: 0.1.0
+  description: Event contracts
+  contact: { name: Dev }
+  license: { name: MIT }
+defaultContentType: application/json
+servers:
+  dev:
+    host: localhost
+    protocol: kafka
+    description: local stub
+channels: {}

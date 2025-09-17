@@ -1,0 +1,37 @@
+openapi: 3.0.3
+info:
+  title: Therapy App API
+  version: 0.1.0
+  description: HTTP contracts
+servers:
+  - url: http://localhost:3000
+    description: dev
+paths:
+  /intake:
+    post:
+      operationId: createIntake
+      tags: [intake]
+      summary: Create intake
+      description: Store patient intake and insurance
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: './schemas/IntakeV1.json'
+      responses:
+        '200': { description: OK }
+  /bookings:
+    post:
+      operationId: createBooking
+      tags: [booking]
+      summary: Confirm booking
+      description: Create a booking after slot lock
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: './schemas/BookingV1.json'
+      responses:
+        '200': { description: OK }

@@ -1,0 +1,15 @@
+{
+  "name": "therapy_app_v3",
+  "private": true,
+  "scripts": {
+    "docs:render": "mmdc -i docs/02-dataflow.mmd -o docs/02-dataflow.png && mmdc -i docs/03-sequence-booking.mmd -o docs/03-sequence-booking.png && mmdc -i docs/04-state-booking.mmd -o docs/04-state-booking.png",
+    "spec:lint": "spectral lint spec/openapi.yaml",
+    "asyncapi:lint": "asyncapi validate spec/asyncapi.yaml"
+  },
+  "packageManager": "pnpm@10.16.1+sha512.0e155aa2629db8672b49e8475da6226aa4bdea85fdcdfdc15350874946d4f3c91faaf64cbdc4a5d1ab8002f473d5c3fcedcd197989cf0390f9badd3c04678706",
+  "devDependencies": {
+    "@asyncapi/cli": "^3.5.2",
+    "@mermaid-js/mermaid-cli": "^11.10.1",
+    "@stoplight/spectral-cli": "^6.15.0"
+  }
+}
