@@ -1,12 +1,6 @@
-ignoredBuiltDependencies:
-  - '@hyperjump/json-pointer'
-  - '@hyperjump/json-schema'
-  - '@hyperjump/json-schema-core'
-  - '@hyperjump/pact'
-  - protobufjs
-  - yarn
+packages:
+  - app
 
 onlyBuiltDependencies:
-  - '@asyncapi/cli'
-  - puppeteer
-  - sharp
+  - '@tailwindcss/oxide'
+  - unrs-resolver

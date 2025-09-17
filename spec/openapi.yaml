@@ -35,3 +35,8 @@ paths:
               $ref: './schemas/BookingV1.json'
       responses:
         '200': { description: OK }
+
+
+tags:
+  - name: intake
+  - name: booking
