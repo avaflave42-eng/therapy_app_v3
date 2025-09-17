@@ -1,0 +1,7 @@
+#!/bin/sh
+. "$(dirname "$0")/_/husky.sh"
+
+pnpm spec:lint || exit 1
+pnpm asyncapi:lint || exit 1
+pnpm docs:render || exit 1
+git add docs/*.png 2>/dev/null || true
