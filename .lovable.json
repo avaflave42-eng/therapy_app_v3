@@ -1,0 +1,4 @@
+{
+  "allowedPaths": ["app/**","spec/**","docs/**"],
+  "forbiddenPaths": ["supabase/migrations/**",".github/**"]
+}
