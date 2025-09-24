@@ -13,5 +13,8 @@
     "@mermaid-js/mermaid-cli": "^11.10.1",
     "@stoplight/spectral-cli": "^6.15.0",
     "husky": "^8.0.0"
+  },
+  "dependencies": {
+    "stripe": "^18.5.0"
   }
 }
