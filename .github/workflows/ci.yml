@@ -42,6 +42,6 @@ jobs:
 
       - name: Lint AsyncAPI
         run: pnpm asyncapi:lint
-
+ 
       - name: Render Mermaid diagrams
         run: xvfb-run -a pnpm docs:render
