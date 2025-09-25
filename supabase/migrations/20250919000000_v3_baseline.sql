@@ -53,9 +53,6 @@ create table if not exists eligibility_snapshots (
 );
 
 -- indexes
-create index if not exists idx_practitioners_specialties on practitioners using gin (specialties);
-create index if not exists idx_practitioners_languages   on practitioners using gin (languages);
-create index if not exists idx_bookings_patient on bookings(patient_id);
 create index if not exists idx_bookings_pract   on bookings(practitioner_id);
 
 -- RLS
@@ -81,3 +78,57 @@ create policy "patient_reads_own_elig"
   using (exists (select 1 from patients p where p.id = eligibility_snapshots.patient_id and p.user_id = auth.uid()));
 
 -- write policies will be added later via RPC
+
+-- guard index creation to avoid failures when table pre-exists
+do $$
+begin
+  if exists (
+    select 1 from information_schema.columns
+    where table_schema='public' and table_name='practitioners' and column_name='specialties'
+  ) then
+    create index if not exists idx_practitioners_specialties on practitioners using gin (specialties);
+  end if;
+
+  if exists (
+    select 1 from information_schema.columns
+    where table_schema='public' and table_name='practitioners' and column_name='languages'
+  ) then
+    create index if not exists idx_practitioners_languages on practitioners using gin (languages);
+  end if;
+end$$;
+
+-- guarded bookings indexes
+do $$
+begin
+  if exists (
+    select 1 from information_schema.columns
+    where table_schema='public' and table_name='bookings' and column_name='patient_id'
+  ) then
+    create index if not exists idx_bookings_patient on bookings(patient_id);
+  end if;
+
+  if exists (
+    select 1 from information_schema.columns
+    where table_schema='public' and table_name='bookings' and column_name='practitioner_id'
+  ) then
+    create index if not exists idx_bookings_practitioner on bookings(practitioner_id);
+  end if;
+end$$;
+
+-- guarded bookings indexes
+do $$
+begin
+  if exists (
+    select 1 from information_schema.columns
+    where table_schema='public' and table_name='bookings' and column_name='patient_id'
+  ) then
+    create index if not exists idx_bookings_patient on bookings(patient_id);
+  end if;
+
+  if exists (
+    select 1 from information_schema.columns
+    where table_schema='public' and table_name='bookings' and column_name='practitioner_id'
+  ) then
+    create index if not exists idx_bookings_practitioner on bookings(practitioner_id);
+  end if;
+end$$;
