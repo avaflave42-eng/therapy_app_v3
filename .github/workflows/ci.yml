@@ -32,7 +32,7 @@ jobs:
             fonts-noto-color-emoji
 
       - name: Install deps
-        run: pnpm install --frozen-lockfile
+        run: pnpm install --no-frozen-lockfile
 
       - name: Ensure Chromium for Puppeteer
         run: npx puppeteer browsers install chrome
