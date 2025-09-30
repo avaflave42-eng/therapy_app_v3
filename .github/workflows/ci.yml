@@ -36,10 +36,12 @@ jobs:
 
       - name: Ensure Chrome for Mermaid
         run: |
-          # Download Chrome managed by Puppeteer
-          npx puppeteer browsers install chrome
-          # Expose the path so mermaid-cli (puppeteer-core) can launch it
-          echo "PUPPETEER_EXECUTABLE_PATH=$(npx puppeteer browsers path chrome)" >> $GITHUB_ENV
+          # Install a Puppeteer-managed browser that matches puppeteer-core
+          npx puppeteer browsers install chrome-headless-shell@stable
+          # Tell mermaid-cli (puppeteer-core) exactly where that binary is
+          echo "PUPPETEER_EXECUTABLE_PATH=$(npx puppeteer browsers path chrome-headless-shell)" >> $GITHUB_ENV
+          # Ensure the default cache dir exists
+          echo "PUPPETEER_CACHE_DIR=$HOME/.cache/puppeteer" >> $GITHUB_ENV
 
       - name: Lint OpenAPI
         run: pnpm spec:lint
@@ -49,4 +51,3 @@ jobs:
 
       - name: Render Mermaid diagrams
         run: xvfb-run -a pnpm docs:render
-
