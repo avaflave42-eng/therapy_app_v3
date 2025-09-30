@@ -49,3 +49,4 @@ jobs:
 
       - name: Render Mermaid diagrams
         run: xvfb-run -a pnpm docs:render
+
