@@ -34,8 +34,12 @@ jobs:
       - name: Install deps
         run: pnpm install --no-frozen-lockfile
 
-      - name: Ensure Chromium for Puppeteer
-        run: npx puppeteer browsers install chrome
+      - name: Ensure Chrome for Mermaid
+        run: |
+          # Download Chrome managed by Puppeteer
+          npx puppeteer browsers install chrome
+          # Expose the path so mermaid-cli (puppeteer-core) can launch it
+          echo "PUPPETEER_EXECUTABLE_PATH=$(npx puppeteer browsers path chrome)" >> $GITHUB_ENV
 
       - name: Lint OpenAPI
         run: pnpm spec:lint
