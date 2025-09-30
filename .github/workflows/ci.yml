@@ -15,33 +15,57 @@ jobs:
       - name: Setup Node
         uses: actions/setup-node@v4
         with:
-          node-version: '20'
-          cache: 'pnpm'
+          node-version: 20
 
-      - name: Enable pnpm
-        run: |
-          corepack enable
-          corepack prepare pnpm@10.16.1 --activate
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          run_install: false
 
       - name: Install system deps for headless Chromium
         run: |
           sudo apt-get update
-          sudo apt-get install -y \
+          sudo apt-get install -y --no-install-recommends \
             xvfb libxshmfence1 libnss3 libx11-xcb1 libxcomposite1 libxdamage1 \
-            libxfixes3 libxrandr2 libgbm1 libasound2 libatk1.0-0 libatk-bridge2.0-0 \
+            libxfixes3 libxrandr2 libgbm1 \
+            libasound2t64 libatk1.0-0t64 libatk-bridge2.0-0t64 \
             fonts-noto-color-emoji
 
       - name: Install deps
-        run: pnpm install --frozen-lockfile
+        run: pnpm install --no-frozen-lockfile
 
-      - name: Ensure Chromium for Puppeteer
-        run: npx puppeteer browsers install chrome
+      - name: Install Chrome Headless Shell for Puppeteer
+        id: pptr
+        run: |
+          set -euo pipefail
+          export PUPPETEER_CACHE_DIR="$HOME/.cache/puppeteer"
+          # Install the headless shell build that puppeteer-core wants
+          npx puppeteer browsers install chrome-headless-shell@stable
+          CHROME_PATH="$(PUPPETEER_CACHE_DIR="$PUPPETEER_CACHE_DIR" npx puppeteer browsers path chrome-headless-shell)"
+          echo "path=$CHROME_PATH" >> "$GITHUB_OUTPUT"
+          echo "cache=$PUPPETEER_CACHE_DIR" >> "$GITHUB_OUTPUT"
+          echo "Resolved Chrome path: $CHROME_PATH"
+          test -x "$CHROME_PATH"
+
+      - name: Export browser env
+        run: |
+          echo "PUPPETEER_EXECUTABLE_PATH=${{ steps.pptr.outputs.path }}" >> "$GITHUB_ENV"
+          echo "PUPPETEER_CACHE_DIR=${{ steps.pptr.outputs.cache }}" >> "$GITHUB_ENV"
+
+      - name: Debug Puppeteer env
+        run: |
+          echo "PUPPETEER_EXECUTABLE_PATH -> ${{ steps.pptr.outputs.path }}"
+          echo "PUPPETEER_CACHE_DIR       -> ${{ steps.pptr.outputs.cache }}"
+          ls -la "${{ steps.pptr.outputs.cache }}" || true
 
       - name: Lint OpenAPI
         run: pnpm spec:lint
 
       - name: Lint AsyncAPI
         run: pnpm asyncapi:lint
- 
+
       - name: Render Mermaid diagrams
-        run: xvfb-run -a pnpm docs:render
+        env:
+          PUPPETEER_EXECUTABLE_PATH: ${{ steps.pptr.outputs.path }}
+          PUPPETEER_CACHE_DIR: ${{ steps.pptr.outputs.cache }}
+        run: xvfb-run --server-args="-screen 0 1280x720x24" pnpm docs:render
