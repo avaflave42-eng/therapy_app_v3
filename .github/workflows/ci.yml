@@ -38,16 +38,20 @@ jobs:
         id: pptr
         run: |
           set -euo pipefail
-          # Install a Puppeteer-managed Chrome
+          # Use a consistent cache dir for both install and path lookups
+          export PUPPETEER_CACHE_DIR="$HOME/.cache/puppeteer"
+          # Install a managed Chrome (same channel puppeteer-core expects)
           npx puppeteer browsers install chrome@stable
-          # Capture the absolute path to that Chrome
-          echo "path=$(npx puppeteer browsers path chrome)" >> "$GITHUB_OUTPUT"
+          # Capture absolute path to that Chrome
+          CHROME_PATH="$(PUPPETEER_CACHE_DIR="$PUPPETEER_CACHE_DIR" npx puppeteer browsers path chrome)"
+          echo "path=$CHROME_PATH" >> "$GITHUB_OUTPUT"
+          echo "cache=$PUPPETEER_CACHE_DIR" >> "$GITHUB_OUTPUT"
 
-      - name: Export browser env
+      - name: Debug Puppeteer env
         run: |
-          echo "PUPPETEER_EXECUTABLE_PATH=${{ steps.pptr.outputs.path }}" >> "$GITHUB_ENV"
-          echo "PUPPETEER_CACHE_DIR=$HOME/.cache/puppeteer" >> "$GITHUB_ENV"
-          echo "Using Chrome at: ${{ steps.pptr.outputs.path }}"
+          echo "PUPPETEER_EXECUTABLE_PATH -> ${{ steps.pptr.outputs.path }}"
+          echo "PUPPETEER_CACHE_DIR       -> ${{ steps.pptr.outputs.cache }}"
+          ls -la "${{ steps.pptr.outputs.cache }}" || true
 
       - name: Lint OpenAPI
         run: pnpm spec:lint
@@ -56,5 +60,7 @@ jobs:
         run: pnpm asyncapi:lint
 
       - name: Render Mermaid diagrams
+        env:
+          PUPPETEER_EXECUTABLE_PATH: ${{ steps.pptr.outputs.path }}
+          PUPPETEER_CACHE_DIR: ${{ steps.pptr.outputs.cache }}
         run: xvfb-run --server-args="-screen 0 1280x720x24" pnpm docs:render
-
