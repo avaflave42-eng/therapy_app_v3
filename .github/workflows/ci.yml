@@ -34,14 +34,20 @@ jobs:
       - name: Install deps
         run: pnpm install --no-frozen-lockfile
 
-      - name: Ensure Chrome for Mermaid
+      - name: Install Chrome for Puppeteer
+        id: pptr
         run: |
-          # Install a Puppeteer-managed browser that matches puppeteer-core
-          npx puppeteer browsers install chrome-headless-shell@stable
-          # Tell mermaid-cli (puppeteer-core) exactly where that binary is
-          echo "PUPPETEER_EXECUTABLE_PATH=$(npx puppeteer browsers path chrome-headless-shell)" >> $GITHUB_ENV
-          # Ensure the default cache dir exists
-          echo "PUPPETEER_CACHE_DIR=$HOME/.cache/puppeteer" >> $GITHUB_ENV
+          set -euo pipefail
+          # Install a Puppeteer-managed Chrome
+          npx puppeteer browsers install chrome@stable
+          # Capture the absolute path to that Chrome
+          echo "path=$(npx puppeteer browsers path chrome)" >> "$GITHUB_OUTPUT"
+
+      - name: Export browser env
+        run: |
+          echo "PUPPETEER_EXECUTABLE_PATH=${{ steps.pptr.outputs.path }}" >> "$GITHUB_ENV"
+          echo "PUPPETEER_CACHE_DIR=$HOME/.cache/puppeteer" >> "$GITHUB_ENV"
+          echo "Using Chrome at: ${{ steps.pptr.outputs.path }}"
 
       - name: Lint OpenAPI
         run: pnpm spec:lint
@@ -50,4 +56,5 @@ jobs:
         run: pnpm asyncapi:lint
 
       - name: Render Mermaid diagrams
-        run: xvfb-run -a pnpm docs:render
+        run: xvfb-run --server-args="-screen 0 1280x720x24" pnpm docs:render
+
