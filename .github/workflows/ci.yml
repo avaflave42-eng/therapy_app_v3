@@ -34,18 +34,23 @@ jobs:
       - name: Install deps
         run: pnpm install --no-frozen-lockfile
 
-      - name: Install Chrome for Puppeteer
+      - name: Install Chrome Headless Shell for Puppeteer
         id: pptr
         run: |
           set -euo pipefail
-          # Use a consistent cache dir for both install and path lookups
           export PUPPETEER_CACHE_DIR="$HOME/.cache/puppeteer"
-          # Install a managed Chrome (same channel puppeteer-core expects)
-          npx puppeteer browsers install chrome@stable
-          # Capture absolute path to that Chrome
-          CHROME_PATH="$(PUPPETEER_CACHE_DIR="$PUPPETEER_CACHE_DIR" npx puppeteer browsers path chrome)"
+          # Install the headless shell build that puppeteer-core wants
+          npx puppeteer browsers install chrome-headless-shell@stable
+          CHROME_PATH="$(PUPPETEER_CACHE_DIR="$PUPPETEER_CACHE_DIR" npx puppeteer browsers path chrome-headless-shell)"
           echo "path=$CHROME_PATH" >> "$GITHUB_OUTPUT"
           echo "cache=$PUPPETEER_CACHE_DIR" >> "$GITHUB_OUTPUT"
+          echo "Resolved Chrome path: $CHROME_PATH"
+          test -x "$CHROME_PATH"
+
+      - name: Export browser env
+        run: |
+          echo "PUPPETEER_EXECUTABLE_PATH=${{ steps.pptr.outputs.path }}" >> "$GITHUB_ENV"
+          echo "PUPPETEER_CACHE_DIR=${{ steps.pptr.outputs.cache }}" >> "$GITHUB_ENV"
 
       - name: Debug Puppeteer env
         run: |
